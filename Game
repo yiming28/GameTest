@@ -121,7 +121,7 @@ public class Game {
             System.out.println("please input column");
             int col = reader.nextInt();
             if (!drop(plate, row, col, piece)) {
-                System.out.println("There is already used in this place, please re-input");
+                System.out.println("There is already used here, please re-input");
                 continue;
             }
             s++;
