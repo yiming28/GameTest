@@ -1,0 +1,147 @@
+
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class GameTest {
+
+    static ArrayList bulidLine() {
+        ArrayList line = new ArrayList();
+        for (int i = 0; i < 7; i++) {
+            line.add("-");
+        }
+        return line;
+    }
+
+    static ArrayList bulidBlanks() {
+        ArrayList blanks = new ArrayList();
+        for (int i = 0; i < 3; i++) {
+            blanks.add("|");
+            blanks.add(" ");
+        }
+        blanks.add("|");
+        return blanks;
+    }
+
+    static ArrayList bulidPlaste() {
+        ArrayList plate = new ArrayList();
+        for (int i = 0; i < 3; i++) {
+            plate.add(bulidLine());
+            plate.add(bulidBlanks());
+        }
+        plate.add(bulidLine());
+        return plate;
+    }
+
+    static void show(ArrayList plate) {
+        for (int i = 0; i < plate.size(); i++) {
+            ArrayList row = (ArrayList) plate.get(i);
+            for (int j = 0; j < row.size(); j++) {
+                System.out.print(row.get(j));
+            }
+            System.out.println();
+        }
+    }
+
+    static boolean drop(ArrayList plate, int r, int c, String piece) {
+        r = 2 * r - 1;
+        c = 2 * c - 1;
+        ArrayList row = (ArrayList) plate.get(r);
+        if (row.get(c) == " ") {
+            row.set(c, piece);
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean judge(ArrayList plate, int n, String piece) {
+
+        int r;
+        int count;
+        for (r = 1; r < 2 * n + 1; r += 2) {
+            //判断行
+            count = 0;
+            ArrayList row = (ArrayList) plate.get(r);
+            for (int j = 1; j < 2 * n + 1; j += 2) {
+                if (row.get(j) == piece) {
+                    count += 1;
+                    if (count == n) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        for (int i = 1; i < 2 * n + 1; i += 2) {
+            count = 0;
+            ArrayList row = (ArrayList) plate.get(i);
+            for (int j = 1; j < 2 * n + 1; j += 2) {
+                if (row.get(j) == piece) {
+                    count += 1;
+                    if (count == n) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        for (int i = 1; i < 2 * n + 1; i += 2) {
+            count = 0;
+            ArrayList row = (ArrayList) plate.get(i);
+            if (row.get(i) == piece) {
+                count += 1;
+                if (count == n) {
+                    return true;
+                }
+            }
+        }
+
+        for (int i = 2 * n - 1; i > 0; i -= 2) {
+            count = 0;
+            ArrayList row = (ArrayList) plate.get(i);
+            if (row.get(i) == piece) {
+                count += 1;
+                if (count == n) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public static void main(String[] args) {
+        Scanner reader = new Scanner(System.in);
+        ArrayList plate = bulidPlaste();
+        show(plate);
+        String piece = "x";
+        int s = 0;
+        while (true) {
+            System.out.println("please input row");
+            int row = reader.nextInt();
+            System.out.println("please input column");
+            int col = reader.nextInt();
+            if (!drop(plate, row, col, piece)) {
+                System.out.println("There is already used in this place, please re-input");
+                continue;
+            }
+            s++;
+            if (s == 3 * 3) {
+                if (judge(plate, 3, piece)) {
+                    System.out.println(piece + " win");
+                    break;
+                } else {
+                    System.out.println("draw");
+                }
+                break;
+            }
+            show(plate);
+
+            if (judge(plate, 3, piece)) {
+                System.out.println(piece + " win");
+                break;
+            }
+            piece = piece == "x" ? "o" : "x";
+        }
+    }
+
+}
