@@ -4,144 +4,101 @@ import java.util.Scanner;
 
 public class Game {
 
-    static ArrayList bulidLine() {
-        ArrayList line = new ArrayList();
-        for (int i = 0; i < 7; i++) {
-            line.add("-");
-        }
-        return line;
-    }
+    static int[][] x = new int[3][3];
+    static int[][] o = new int[3][3];
+    static int row;
+    static int rank;
 
-    static ArrayList bulidBlanks() {
-        ArrayList blanks = new ArrayList();
-        for (int i = 0; i < 3; i++) {
-            blanks.add("|");
-            blanks.add(" ");
-        }
-        blanks.add("|");
-        return blanks;
-    }
-
-    static ArrayList bulidPlaste() {
-        ArrayList plate = new ArrayList();
-        for (int i = 0; i < 3; i++) {
-            plate.add(bulidLine());
-            plate.add(bulidBlanks());
-        }
-        plate.add(bulidLine());
-        return plate;
-    }
-
-    static void show(ArrayList plate) {
-        for (int i = 0; i < plate.size(); i++) {
-            ArrayList row = (ArrayList) plate.get(i);
-            for (int j = 0; j < row.size(); j++) {
-                System.out.print(row.get(j));
+    public static boolean judge(int[][] m, int i, int j) {
+        int num0 = 0;
+        int num1 = 0;
+        int num2 = 0;
+        int num3 = 0;
+        for (int l = 0; l < 3; l++) {
+            if (i == j) {
+                if (m[l][l] == 1) {
+                    num0 += 1;
+                }
             }
-            System.out.println();
-        }
-    }
 
-    static boolean drop(ArrayList plate, int r, int c, String piece) {
-        r = 2 * r - 1;
-        c = 2 * c - 1;
-        ArrayList row = (ArrayList) plate.get(r);
-        if (row.get(c) == " ") {
-            row.set(c, piece);
+            if (i == 2 - j) {
+                if (m[l][2 - l] == 1) {
+                    num1 += 1;
+                }
+            }
+            if (m[i][l] == 1) {
+                num2 += 1;
+            }
+            if (m[l][j] == 1) {
+                num3 += 1;
+            }
+        }
+
+        if (num0 == 3 || num1 == 3 || num2 == 3 || num3 == 3) {
             return true;
+        } else {
+            return false;
         }
-        return false;
     }
 
-    public static boolean judge(ArrayList plate, int n, String piece) {
 
-        int r;
-        int count;
-        for (r = 1; r < 2 * n + 1; r += 2) {
-            //判断行
-            count = 0;
-            ArrayList row = (ArrayList) plate.get(r);
-            for (int j = 1; j < 2 * n + 1; j += 2) {
-                if (row.get(j) == piece) {
-                    count += 1;
-                    if (count == n) {
-                        return true;
-                    }
+    static void position(int[][] xo, int m, char player) {
+        Scanner input = new Scanner(System.in);
+        System.out.print("player: " + player + " input row：");
+        row = input.nextInt() - 1;
+        System.out.print("player: " + player + " input rank：");
+        rank = input.nextInt() - 1;
+
+        if (row > 2 || rank > 2 || row < 0 || rank < 0) {
+            System.out.println("row and rank should less than 3，please re-input");
+            position(xo, m, player);
+        } else if (x[row][rank] + o[row][rank] > 0) {
+            System.out.println("coordinate is repeated，please re-input");
+            position(xo, m, player);
+        } else {
+            xo[row][rank] = 1;
+            printMap();
+        }
+    }
+
+    public static void printMap() {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (x[i][j] == 1) {
+                    System.out.print(" x |");
+                } else if (o[i][j] == 1) {
+                    System.out.print(" o |");
+                } else {
+                    System.out.print("   |");
                 }
             }
+            System.out.println("");
         }
-
-        for (int i = 1; i < 2 * n + 1; i += 2) {
-            count = 0;
-            ArrayList row = (ArrayList) plate.get(i);
-            for (int j = 1; j < 2 * n + 1; j += 2) {
-                if (row.get(j) == piece) {
-                    count += 1;
-                    if (count == n) {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        for (int i = 1; i < 2 * n + 1; i += 2) {
-            count = 0;
-            ArrayList row = (ArrayList) plate.get(i);
-            if (row.get(i) == piece) {
-                count += 1;
-                if (count == n) {
-                    return true;
-                }
-            }
-        }
-
-        for (int i = 2 * n - 1; i > 0; i -= 2) {
-            count = 0;
-            ArrayList row = (ArrayList) plate.get(i);
-            if (row.get(i) == piece) {
-                count += 1;
-                if (count == n) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
     public static void main(String[] args) {
-        Scanner reader = new Scanner(System.in);
-        ArrayList plate = bulidPlaste();
-        show(plate);
-        String piece = "x";
-        int s = 0;
-        while (true) {
-            System.out.println("please input row");
-            int row = reader.nextInt();
-            System.out.println("please input column");
-            int col = reader.nextInt();
-            if (!drop(plate, row, col, piece)) {
-                System.out.println("There is already used here, please re-input");
-                continue;
-            }
-            s++;
-            if (s == 3 * 3) {
-                if (judge(plate, 3, piece)) {
-                    System.out.println(piece + " win");
-                    break;
-                } else {
-                    System.out.println("draw");
-                }
-                break;
-            }
-            show(plate);
+        boolean res = false;
+        char player;
 
-            if (judge(plate, 3, piece)) {
-                System.out.println(piece + " win");
-                break;
+        for (int i = 1; i < 10; i++) {
+            int m = i % 2;
+
+            if (m == 0) {
+                player = 'x';
+                position(x, m, 'x');
+                res = judge(x, row, rank);
+            } else {
+                player = 'o';
+                position(o, m, 'o');
+                res = judge(o, row, rank);
             }
-            piece = piece == "x" ? "o" : "x";
+            if (res) {
+                System.out.println("player: " + player + "win");
+                break;
+
+            } else if (i == 9) {
+                System.out.println("draw");
+            }
         }
     }
-
 }
